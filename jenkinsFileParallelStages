@@ -1,0 +1,40 @@
+pipeline {
+ agent any
+  environment {
+         APP = 'frontend'
+         ENVI = 'prod'
+                }
+ stages {
+        stage('Build') { 
+            steps { 
+                echo "build sucessfully" 
+                echo "App: ${env.APP}"
+                sh 'sleep 6'
+            }
+        }
+        stage('Parallel Testing') {
+            parallel {
+                stage('TEST1') {
+                    steps {
+                        echo "This is TEST1 Chrome test stage"
+                        sleep 5
+                    }
+                }
+
+                stage('TEST2') {
+                    steps {
+                        echo "This is TEST2 Firefox test stage"
+                        sleep 5
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "App: ${env.APP}"
+                echo "Envi: ${env.ENVI}"
+               echo "deploy successfully in production"
+            }
+        }
+    }
+}
