@@ -1,0 +1,51 @@
+pipeline {
+ agent any
+  environment {
+         APP = 'frontend'
+         ENVI = 'prod'
+                }
+ parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+
+        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+    }        
+ stages {
+        stage('Build') { 
+            steps { 
+                echo "build sucessfully" 
+                echo "App: ${env.APP}"
+                sh 'sleep 6'
+            }
+        }
+        stage('Parallel Testing') {
+            parallel {
+                stage('TEST1') {
+                    steps {
+                        echo "This is TEST1 Chrome test stage"
+                        sleep 5
+                    }
+                }
+
+                stage('TEST2') {
+                    steps {
+                        echo "This is TEST2 Firefox test stage"
+                        sleep 5
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "App: ${env.APP}"
+                echo "Envi: ${env.ENVI}"
+               echo "deploy successfully in production"
+            }
+        }
+    }
+}
