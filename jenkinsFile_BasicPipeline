@@ -1,0 +1,22 @@
+pipeline {
+ agent any
+ stages {
+        stage('Build') { 
+            steps { 
+                echo "build sucessfully" 
+                sh 'sleep 6'
+            }
+        }
+        stage('Test'){
+            steps {
+                echo "Test successfully in prod" 
+                sh 'sleep 6'
+            }
+        }
+        stage('Deploy') {
+            steps {
+               echo "deploy successfully in production"
+            }
+        }
+    }
+}
