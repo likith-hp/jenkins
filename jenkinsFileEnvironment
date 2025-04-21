@@ -8,21 +8,21 @@ pipeline {
         stage('Build') { 
             steps { 
                 echo "build sucessfully" 
-                echo ${env.APP}
+                echo "App: ${env.APP}"
                 sh 'sleep 6'
             }
         }
         stage('Test'){
             steps {
                 echo "Test successfully in prod" 
-                 echo ${env.APP}
+                 echo "App: ${env.APP}"
                 sh 'sleep 6'
             }
         }
         stage('Deploy') {
             steps {
-                echo ${env.APP}
-                echo ${env.ENVI}
+                echo "App: ${env.APP}"
+                echo "Envi: ${env.ENVI}"
                echo "deploy successfully in production"
             }
         }
