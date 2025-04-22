@@ -45,7 +45,7 @@ pipeline {
                         input message: 'Deploying to production. Are you sure?', ok: 'Yes, Deploy!'
                     }
                 }
-                sh "deploy to ${params.ENVIRONMENT}"
+                echo "deploy to ${params.ENVIRONMENT}"
             }
         }
     }
