@@ -1,51 +1,53 @@
 pipeline {
- agent any
-  environment {
-         APP = 'frontend'
-         ENVI = 'prod'
-                }
- parameters {
-        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+    agent any
 
-        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'prod'],
+            description: 'Select the environment to deploy to.'
+        )
+        booleanParam(
+            name: 'RUN_TESTS',
+            defaultValue: true,
+            description: 'Check to run unit tests before deploying.'
+        )
+        string(
+            name: 'GIT_BRANCH',
+            defaultValue: 'main',
+            description: 'Git branch to build from.'
+        )
+    }
 
-        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
-
-        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-
-        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
-    }        
- stages {
-        stage('Build') { 
-            steps { 
-                echo "build sucessfully" 
-                echo "App: ${env.APP}"
-                sh 'sleep 6'
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out branch: ${params.GIT_BRANCH}"
+                git branch: "${params.GIT_BRANCH}", credentialsId: 'git_creditial', url: 'https://github.com/likith-hp/jenkins.git'
             }
         }
-        stage('Parallel Testing') {
-            parallel {
-                stage('TEST1') {
-                    steps {
-                        echo "This is TEST1 Chrome test stage"
-                        sleep 5
-                    }
-                }
 
-                stage('TEST2') {
-                    steps {
-                        echo "This is TEST2 Firefox test stage"
-                        sleep 5
-                    }
-                }
+        stage('Test') {
+            when {
+                expression { return params.RUN_TESTS }
+            }
+            steps {
+                echo "Running unit tests..."
+                sh "sleep 7"
             }
         }
+
         stage('Deploy') {
             steps {
-                echo "App: ${env.APP}"
-                echo "Envi: ${env.ENVI}"
-               echo "deploy successfully in production"
+                script {
+                    echo "Deploying to ${params.ENVIRONMENT} environment"
+                    if (params.ENVIRONMENT == 'prod') {
+                        input message: 'Deploying to production. Are you sure?', ok: 'Yes, Deploy!'
+                    }
+                }
+                sh "deploy to ${params.ENVIRONMENT}"
             }
         }
     }
+
 }
