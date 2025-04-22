@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'prod'],
+            description: 'Select the environment to deploy to.'
+        )
+        booleanParam(
+            name: 'RUN_TESTS',
+            defaultValue: true,
+            description: 'Check to run unit tests before deploying.'
+        )
+        string(
+            name: 'GIT_BRANCH',
+            defaultValue: 'main',
+            description: 'Git branch to build from.'
+        )
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out branch: ${params.GIT_BRANCH}"
+                git branch: "${params.GIT_BRANCH}", credentialsId: 'git_creditial', url: 'https://github.com/likith-hp/jenkins.git'
+            }
+        }
+
+        stage('Test') {
+            when {
+                expression { return params.RUN_TESTS }
+            }
+            steps {
+                echo "Running unit tests..."
+                sh "sleep 7"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    echo "Deploying to ${params.ENVIRONMENT} environment"
+                    if (params.ENVIRONMENT == 'prod') {
+                        input message: 'Deploying to production. Are you sure?', ok: 'Yes, Deploy!'
+                    }
+                }
+                echo "deploy to ${params.ENVIRONMENT}"
+            }
+        }
+    }
+
+}
